@@ -157,10 +157,16 @@ class KaratsubaMultiplication : public Multiplication
 public:
 	LongValue Multiply(LongValue a, LongValue b) override
 	{
-		int adigits = a.digits.length();
-		int bdigits = b.digits.length();
-		int n = adigits % 2 == 0 ? adigits : adigits + 1;
-		int m = bdigits % 2 == 0 ? bdigits : bdigits + 1;
+		size_t aDigits = a.digits.length();
+		size_t bDigits = b.digits.length();
+		if(aDigits == 1 || bDigits == 1)
+		{
+			LongValue res;
+			res = (a.digits[0] - '0') * (b.digits[0] - '0');
+			return res;
+		}
+		size_t longestValue = max(aDigits, bDigits);
+		size_t n = longestValue % 2 == 0 ? aDigits / 2 : floor(aDigits / 2.0) + 1;
 
 		LongValue l("45");
 		return l;
