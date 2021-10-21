@@ -8,6 +8,7 @@
 #include <bits/stdc++.h>
 #include <iostream>
 #include <string>
+#include <utility>
 
 using namespace std;
 
@@ -21,22 +22,27 @@ public:
 	static Multiplication *multiplication;
 	string digits;
 
-	LongValue(string value = "")
+	explicit LongValue(string value = "")
 	{
-		digits = value;
+		digits = move(value);
 	}
 
-	LongValue operator*(LongValue other);
+	LongValue(const LongValue &other)
+	{
+		digits = other.digits;
+	}
+
+	LongValue operator*(LongValue const &other);
 
 	LongValue operator+(LongValue other);
 
 	LongValue operator-(LongValue other);
 
-	LongValue &operator=(string &value);
+	LongValue &operator=(const string &value);
 
-	LongValue &operator=(int value);
+	LongValue &operator=(const int value);
 
-	LongValue operator<<(int num);
+	LongValue operator<<(size_t num);
 
 private:
 	void AddValue(int &remainder, string &newValue, int &value)
@@ -51,7 +57,7 @@ private:
 			value %= 10;
 			remainder += 1;
 		}
-		newValue += value + '0';
+		newValue += to_string(value);
 	}
 
 	void SumValue(int &remainder, string &newValue, char value, char otherValue)
@@ -67,16 +73,16 @@ private:
 			num %= 10;
 			remainder += 1;
 		}
-		newValue += num + '0';
+		newValue += to_string(num);
 	}
 
-	LongValue CalculateValues(string longerValue, string shorterValue)
+	LongValue CalculateValues(string longerValue, const string &shorterValue)
 	{
 		int remainder = 0;
 		string newValue = "";
 		string otherValue = "";
-		int digitsDifference = longerValue.length() - shorterValue.length();
-		for(int i = 0; i < digitsDifference; i++)
+		size_t digitsDifference = longerValue.length() - shorterValue.length();
+		for(size_t i = 0; i < digitsDifference; i++)
 		{
 			otherValue += "0";
 		}
@@ -90,6 +96,8 @@ private:
 			int value = longerValue[i] - '0';
 			AddValue(remainder, newValue, value);
 		}
+		if(remainder != 0)
+			newValue += to_string(remainder);
 		reverse(newValue.begin(), newValue.end());
 		RemoveLeadingZeros(newValue);
 		LongValue value(newValue);
@@ -135,18 +143,18 @@ public:
 	virtual LongValue Multiply(LongValue a, LongValue b) = 0;
 };
 
-LongValue LongValue::operator*(LongValue other)
+LongValue LongValue::operator*(LongValue const &other)
 {
-	return multiplication->Multiply(*this, std::move(other));
+	return multiplication->Multiply(*this, other);
 }
 
-LongValue &LongValue::operator=(string &value)
+LongValue &LongValue::operator=(const string &value)
 {
 	digits = value;
 	return *this;
 }
 
-LongValue &LongValue::operator=(int value)
+LongValue &LongValue::operator=(const int value)
 {
 	digits = to_string(value);
 	return *this;
@@ -158,6 +166,12 @@ LongValue LongValue::operator+(LongValue other)
 		return *this;
 	if(this->digits == "0")
 		return other;
+	if(digits.length() == 1 && other.digits.length() == 1)
+	{
+		string newValue = to_string((digits[0] - '0') + (other.digits[0] - '0'));
+		LongValue result(newValue);
+		return result;
+	}
 	if(digits.length() > other.digits.length())
 	{
 		return CalculateValues(digits, other.digits);
@@ -169,7 +183,7 @@ LongValue LongValue::operator+(LongValue other)
 	else
 	{
 		int remainder = 0;
-		string newValue;
+		string newValue = "";
 		for(int i = digits.length() - 1; i >= 0; i--)
 		{
 			SumValue(remainder, newValue, digits[i], other.digits[i]);
@@ -188,15 +202,28 @@ LongValue LongValue::operator+(LongValue other)
 LongValue LongValue::operator-(LongValue other)
 {
 	if(other.digits.length() > this->digits.length())
-		return static_cast<LongValue>(NULL);
+		return static_cast<LongValue>(nullptr);
+	if(other.digits.length() == 1 && this->digits.length() == 1)
+	{
+		int a = this->digits[0] - '0';
+		int b = other.digits[0] - '0';
+		if(a >= b)
+		{
+			string result = to_string(a - b);
+			LongValue res(result);
+			return res;
+		}
+		else
+			return static_cast<LongValue>(nullptr);
+	}
 	size_t digitsDifference = this->digits.length() - other.digits.length();
-	string zeros;
+	string zeros = "";
 	for(int i = 0; i < digitsDifference; i++)
 	{
 		zeros += "0";
 	}
 	other.digits = zeros + other.digits;
-	string result;
+	string result = "";
 	int value, remainder = this->digits[other.digits.length() - 1] - '0';
 	for(int i = other.digits.length() - 1; i >= 0; i--)
 	{
@@ -218,10 +245,10 @@ LongValue LongValue::operator-(LongValue other)
 	return res;
 }
 
-LongValue LongValue::operator<<(int num)
+LongValue LongValue::operator<<(size_t num)
 {
 	LongValue copy = *this;
-	for(int i = 0; i < num; i++)
+	for(size_t i = 0; i < num; i++)
 	{
 		copy.digits += "0";
 	}
@@ -241,18 +268,18 @@ public:
 			res = (a.digits[0] - '0') * (b.digits[0] - '0');
 			return res;
 		}
-		size_t longestValue = max(aDigits, bDigits);
-		size_t shortestValue = min(aDigits, bDigits);
-		size_t n = longestValue % 2 == 0 ? aDigits / 2 : floor(aDigits / 2.0);
+		int longestValue = max(aDigits, bDigits);
+		int shortestValue = min(aDigits, bDigits);
+		int n = longestValue % 2 == 0 ? longestValue / 2 : floor(longestValue / 2.0);
 		LongValue a1, a0, b1, b0;
 		string a1Value = "", b1Value = "", a0Value = "", b0Value = "";
-		size_t digitsDifference = longestValue - shortestValue;
+		int digitsDifference = longestValue - shortestValue;
 		if(digitsDifference != 0)
 		{
 			string zeros = "";
 			if(aDigits > bDigits)
 			{
-				for(int i = 0; i < digitsDifference; i++)
+				for(size_t i = 0; i < digitsDifference; i++)
 				{
 					zeros += "0";
 				}
@@ -260,20 +287,20 @@ public:
 			}
 			else
 			{
-				for(int i = 0; i < digitsDifference; i++)
+				for(size_t i = 0; i < digitsDifference; i++)
 				{
 					zeros += "0";
 				}
 				a.digits = zeros + a.digits;
 			}
 		}
-		int border = longestValue % 2 == 0 ? n : n + 1;
-		for(int i = 0; i < border; i++)
+		size_t border = longestValue % 2 == 0 ? n : n + 1;
+		for(size_t i = 0; i < border; i++)
 		{
 			a1Value += a.digits[i];
 			b1Value += b.digits[i];
 		}
-		for(int i = border; i < longestValue; i++)
+		for(size_t i = border; i < longestValue; i++)
 		{
 			a0Value += a.digits[i];
 			b0Value += b.digits[i];
