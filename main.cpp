@@ -1,4 +1,8 @@
 #include "LongValue.h"
+#include "BasicMultiplication.h"
+#include "PrimeTest.h"
+#include "LehmerPrimeTest.h"
+#include "LongValue1.h"
 
 Multiplication *LongValue::multiplication = new SchonhageStrassenMultiplication();
 Multiplication *LongValue::basicMultiplication = new BasicMultiplication();
