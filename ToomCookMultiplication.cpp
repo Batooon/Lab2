@@ -3,7 +3,6 @@
 //
 
 #include "ToomCookMultiplication.h"
-#include "LongValue.h"
 
 LongValue ToomCookMultiplication::Multiply(LongValue a, LongValue b)
 {
