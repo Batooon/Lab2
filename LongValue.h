@@ -16,6 +16,8 @@ using namespace std;
 
 class Multiplication;
 
+class PrimeTest;
+
 void RemoveLeadingZeros(string &value);
 
 class LongValue
@@ -23,10 +25,11 @@ class LongValue
 public:
 	static Multiplication *multiplication;
 	static Multiplication *basicMultiplication;
+	static PrimeTest *primeTest;
 	string digits;
 	bool isPositive = true;
 
-	explicit LongValue(string value = "", bool isPositive = true) : digits(move(value)), isPositive(isPositive)
+	explicit LongValue(string value = "0", bool isPositive = true) : digits(move(value)), isPositive(isPositive)
 	{
 	}
 
@@ -35,6 +38,16 @@ public:
 		digits = other.digits;
 		isPositive = other.isPositive;
 	}
+
+	bool operator!=(const LongValue &other);
+
+	bool operator==(LongValue other);
+
+	bool operator>=(LongValue other);
+
+	bool operator<(int value);
+
+	LongValue operator%(LongValue other);
 
 	LongValue operator/(int other);
 
@@ -49,6 +62,8 @@ public:
 	LongValue &operator=(const string &value);
 
 	LongValue &operator=(int value);
+
+	LongValue &operator=(LongValue other);
 
 	LongValue operator<<(size_t num);
 
@@ -187,27 +202,56 @@ ostream &operator<<(ostream &os, LongValue &l)
 	return os;
 }
 
+LongValue pow(LongValue x, LongValue power)
+{
+	LongValue temp;
+	LongValue zero("0");
+	LongValue two("2");
+
+	if(power == zero)
+		return LongValue("1");
+	temp = pow(x, power / 2);
+	if(power % two == zero)
+		return temp * temp;
+	else
+	{
+		LongValue temptest = temp * temp;
+		LongValue temp1 = x * temptest;
+		return temp1;
+	}
+}
+
 class PrimeTest
 {
 public:
-	virtual bool IsPrime() = 0;
+	virtual bool IsPrime(LongValue value) = 0;
 };
-
-LongValue GenerateRandom(LongValue border)
-{
-	string randomValue;
-	for(int i = border.digits.length() - 1; i >= 0; i--)
-	{
-		
-	}
-}
 
 class LehmerPrimeTest : public PrimeTest
 {
 public:
-	bool IsPrime() override
+	bool IsPrime(LongValue value) override
 	{
+		LongValue zero("0");
+		LongValue one("1");
+		LongValue two("2");
+		LongValue S("4");
+		LongValue k("1");
+		LongValue pn1;
+		LongValue M;
+		LongValue p2("2");
+		LongValue test;
+		pn1 = value - one;
+		test = pow(p2, value);
+		M = test - k;
 
+		while(k != pn1)
+		{
+			LongValue test1 = ((S * S) - two);
+			S = test1 % M;
+			k = k + one;
+		}
+		return S == zero;
 	}
 };
 
@@ -416,6 +460,13 @@ LongValue DivideValue(const LongValue longvalue, const int other, bool addZero =
 	int firstDigits = longvalue.digits[0] - '0';
 	int remainder, value;
 
+	if(longvalue.digits.length() == 1)
+	{
+		value = (longvalue.digits[0] - '0') / other;
+		newValue = to_string(value);
+		return LongValue(newValue, longvalue.isPositive);
+	}
+
 	if(firstDigits < other && firstDigits != 0)
 	{
 		nDigits = 2;
@@ -451,6 +502,61 @@ LongValue DivideValue(const LongValue longvalue, const int other, bool addZero =
 LongValue LongValue::operator/(const int other)
 {
 	return DivideValue(*this, other);
+}
+
+LongValue LongValue::operator%(LongValue other)
+{
+	LongValue a = *this;
+	RemoveLeadingZeros(a);
+
+	if((a - other) < 0)
+		return *this;
+
+	while(a >= other)
+	{
+		a = a - other;
+	}
+	return a;
+}
+
+bool LongValue::operator<(int value)
+{
+	//Так як іншого порівняння окрім нуля ніде не виникає, можна полегшити собі життя і обробити лише цей випадок
+	if(digits.length() == 1 && digits[0] - '0' == 0)
+		return false;
+	return !isPositive;
+}
+
+bool LongValue::operator>=(LongValue other)
+{
+	if(digits.length() > other.digits.length())
+		return true;
+	if(digits.length() < other.digits.length())
+		return false;
+	LongValue res = *this - other;
+	return res.isPositive;
+}
+
+bool LongValue::operator==(LongValue other)
+{
+	LongValue res = *this - other;
+	bool temp1 = res.digits.length() == 1;
+	bool temp2 = res.digits[0] == '0';
+	bool result = temp1 && temp2;
+	return result;
+}
+
+bool LongValue::operator!=(const LongValue &other)
+{
+	bool result = !(*this == other);
+	return result;
+}
+
+LongValue &LongValue::operator=(LongValue other)
+{
+	digits = other.digits;
+	isPositive = other.isPositive;
+	return *this;
 }
 
 class BasicMultiplication : public Multiplication
@@ -627,6 +733,61 @@ public:
 		RemoveLeadingZeros(res);
 
 		return res;
+	}
+};
+
+class SchonhageStrassenMultiplication : public Multiplication
+{
+public:
+	LongValue Multiply(LongValue a, LongValue b) override
+	{
+		LongValue::AdjustNumbers(a.digits, b.digits);
+		int aDigits = a.digits.length();
+		int bDigits = b.digits.length();
+		if(aDigits == 1 && bDigits == 1)
+			return LongValue::basicMultiplication->Multiply(a, b);
+
+		bool positive = a.isPositive && b.isPositive || !a.isPositive && !b.isPositive;
+		LongValue ten("10");
+
+		int length = aDigits + bDigits - 1;
+
+		auto *linearConvolution = new LongValue[length];
+
+		LongValue temp = a;
+
+		for(size_t i = 0; i < aDigits; i++, b.digits.erase(b.digits.length() - 1))
+		{
+			a = temp;
+			for(size_t j = 0; j < bDigits; j++, a.digits.erase(a.digits.length() - 1))
+			{
+				int av, bv;
+				av = a.digits[a.digits.length() - 1] - '0';
+				bv = b.digits[b.digits.length() - 1] - '0';
+				LongValue aValue, bValue;
+				aValue = av;
+				bValue = bv;
+				linearConvolution[i + j] = linearConvolution[i + j] + (aValue * bValue);
+			}
+		}
+
+		LongValue remainder;
+		LongValue result;
+		int digit = 0;
+		for(int i = 0; i < length; i++)
+		{
+			linearConvolution[i] = linearConvolution[i] + remainder;
+			result = result + ((linearConvolution[i] % ten) << digit++);
+			LongValue copy = linearConvolution[i];
+			if(copy.digits.length() > 1)
+				remainder = copy.digits.erase(copy.digits.length() - 1);
+			else
+				remainder = 0;
+		}
+		result = result + (remainder << digit);
+		result.isPositive = positive;
+		delete[] linearConvolution;
+		return result;
 	}
 };
 
