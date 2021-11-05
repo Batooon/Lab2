@@ -3,7 +3,6 @@
 //
 
 #include "SchonhageStrassenMultiplication.h"
-#include "LongValue1.h"
 
 LongValue SchonhageStrassenMultiplication::Multiply(LongValue a, LongValue b)
 {

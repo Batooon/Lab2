@@ -69,4 +69,16 @@ private:
 	LongValue CalculateValues(string longerValue, const string &shorterValue, const bool positive = true);
 };
 
+istream &operator>>(istream &is, LongValue &l);
+
+ostream &operator<<(ostream &os, LongValue &l);
+
+LongValue pow(LongValue x, LongValue power);
+
+LongValue DivideValue(const LongValue &longvalue, const int other, bool addZero = false);
+
+void RemoveLeadingZeros(string &value);
+
+void RemoveLeadingZeros(LongValue &value);
+
 #endif //LAB2_LONGVALUE_H

@@ -242,7 +242,7 @@ LongValue LongValue::operator*(const int other)
 	return basicMultiplication->Multiply(*this, LongValue(to_string(other)));
 }
 
-LongValue DivideValue(const LongValue &longvalue, const int other, bool addZero = false)
+LongValue DivideValue(const LongValue &longvalue, const int other, bool addZero)
 {
 	if(longvalue.digits.length() == 1 && longvalue.digits[0] == '0')
 		return longvalue;
@@ -435,7 +435,7 @@ void LongValue::AddValue(int &remainder, string &newValue, int &value)
 	newValue += to_string(value);
 }
 
-static void LongValue::AdjustNumbers(string &a, string &b)
+void LongValue::AdjustNumbers(string &a, string &b)
 {
 	if(a.length() == b.length())
 		return;

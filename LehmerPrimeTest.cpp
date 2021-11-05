@@ -3,7 +3,7 @@
 //
 
 #include "LehmerPrimeTest.h"
-#include "LongValue1.h"
+#include "LongValue.h"
 
 bool LehmerPrimeTest::IsPrime(LongValue value)
 {

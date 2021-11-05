@@ -3,7 +3,7 @@
 //
 
 #include "KaratsubaMultiplication.h"
-#include "LongValue1.h"
+#include "LongValue.h"
 
 LongValue KaratsubaMultiplication::Multiply(LongValue a, LongValue b)
 {

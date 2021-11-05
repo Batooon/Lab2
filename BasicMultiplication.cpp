@@ -3,7 +3,7 @@
 //
 
 #include "BasicMultiplication.h"
-#include "LongValue1.h"
+#include "LongValue.h"
 
 LongValue BasicMultiplication::Multiply(LongValue a, LongValue b)
 {

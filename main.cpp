@@ -2,7 +2,10 @@
 #include "BasicMultiplication.h"
 #include "PrimeTest.h"
 #include "LehmerPrimeTest.h"
-#include "LongValue1.h"
+#include "SchonhageStrassenMultiplication.h"
+#include "Multiplication.h"
+#include "KaratsubaMultiplication.h"
+#include "ToomCookMultiplication.h"
 
 Multiplication *LongValue::multiplication = new SchonhageStrassenMultiplication();
 Multiplication *LongValue::basicMultiplication = new BasicMultiplication();

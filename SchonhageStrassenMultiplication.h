@@ -6,12 +6,12 @@
 #define LAB2_SCHONHAGESTRASSENMULTIPLICATION_H
 
 #include "LongValue.h"
+#include "Multiplication.h"
 
-
-class SchonhageStrassenMultiplication
+class SchonhageStrassenMultiplication : public Multiplication
 {
 public:
-	LongValue Multiply(LongValue a, LongValue b);
+	LongValue Multiply(LongValue a, LongValue b) override;
 };
 
 
