@@ -1,15 +1,16 @@
 #include "LongValue.h"
 
-Multiplication *LongValue::multiplication = new ToomCookMultiplication();
+Multiplication *LongValue::multiplication = new SchonhageStrassenMultiplication();
 Multiplication *LongValue::basicMultiplication = new BasicMultiplication();
+PrimeTest *LongValue::primeTest = new LehmerPrimeTest();
 
 
 int main()
 {
 	LongValue a, b, c;
 
-	a = "1234567890123456789012425725346346246432";
-	b = "987654321987654321098435643745375463426432";
+	a = "78945623123486743";
+	b = "7894561599517564564";
 	c = a * b;
 	cout << c << endl;
 	return 0;
