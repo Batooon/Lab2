@@ -31,6 +31,8 @@ public:
 
 	LongValue(const LongValue &other);
 
+	bool operator>(const LongValue &other);
+
 	bool operator!=(const LongValue &other);
 
 	bool operator==(const LongValue &other);
@@ -76,6 +78,8 @@ ostream &operator<<(ostream &os, LongValue &l);
 LongValue pow(LongValue x, LongValue power);
 
 LongValue DivideValue(const LongValue &longvalue, const int other, bool addZero = false);
+
+LongValue GetRandom(LongValue &border);
 
 void RemoveLeadingZeros(string &value);
 

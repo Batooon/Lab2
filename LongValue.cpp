@@ -14,6 +14,50 @@ LongValue::LongValue(const LongValue &other)
 	isPositive = other.isPositive;
 }
 
+LongValue GetRandom(LongValue &border)
+{
+	string newValue;
+	bool generatingValue = true;
+	int a;
+	while(generatingValue)
+	{
+		newValue = "";
+		for(size_t i = 0; i < border.digits.length(); i++)
+		{
+			if(i == 0)
+			{
+				a = rand() % (border.digits[i] - '0');
+			}
+			else
+			{
+				do
+				{
+					a = rand() % 10;
+				}
+				while(a == 0);
+			}
+			newValue += to_string(a);
+		}
+		reverse(newValue.begin(), newValue.end());
+		LongValue potentialRes(newValue);
+		if(border > potentialRes)
+		{
+			generatingValue = false;
+		}
+	}
+
+	while(newValue.length() > 1 && (newValue[newValue.length() - 1] - '0') == 0)
+		newValue.erase(newValue.length() - 1);
+
+	if(newValue[0] - '0' < 2 && newValue.length() == 1)
+	{
+		newValue[0] = '2';
+		return LongValue(newValue);
+	}
+
+	return LongValue(newValue);
+}
+
 void RemoveLeadingZeros(string &value)
 {
 	if(value[0] != '0')
@@ -310,12 +354,41 @@ LongValue LongValue::operator%(const LongValue &other)
 	return a;
 }
 
+
 bool LongValue::operator<(int value)
 {
 	//Так як іншого порівняння окрім нуля ніде не виникає, можна полегшити собі життя і обробити лише цей випадок
 	if(digits.length() == 1 && digits[0] - '0' == 0)
 		return false;
 	return !isPositive;
+}
+
+bool LongValue::operator>(const LongValue &other)
+{
+	if(digits[digits.length() - 1] - '0' < 0 && other.digits[other.digits.length() - 1] - '0' >= 0)
+		return false;
+	if(digits[digits.length() - 1] >= 0 && other.digits[other.digits.length() - 1] - '0' < 0)
+		return true;
+	if(digits.length() > other.digits.length())
+		return true;
+	if(digits.length() < other.digits.length())
+		return false;
+	LongValue res = *this - other;
+	if(res != LongValue("0"))
+		return res.isPositive;
+	else
+		return false;
+	/*int i=digits.length()-1;
+	bool greater=false;
+	while(i>=0&&!greater)
+	{
+		if(digits[i]-'0'>other.digits[i]-'0')
+			greater=true;
+		if(digits[i]-'0'<other.digits[i]-'0')
+			i=-1;
+		i-=1;
+	}
+	return greater;*/
 }
 
 bool LongValue::operator>=(const LongValue &other)
