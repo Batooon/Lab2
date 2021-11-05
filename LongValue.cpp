@@ -49,12 +49,6 @@ LongValue GetRandom(LongValue &border)
 	while(newValue.length() > 1 && (newValue[newValue.length() - 1] - '0') == 0)
 		newValue.erase(newValue.length() - 1);
 
-	if(newValue[0] - '0' < 2 && newValue.length() == 1)
-	{
-		newValue[0] = '2';
-		return LongValue(newValue);
-	}
-
 	return LongValue(newValue);
 }
 
